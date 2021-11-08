@@ -9,10 +9,17 @@ class Bloque(db.Model):
     texto = db.Column(db.Text)
     intentos = db.relationship('Intento')
 
+    def __repr__(self):
+        return '<Bloque {}>'.format(self.path_imagen)
+
 class Intento(db.Model):
     """Modelo para intento de lectura"""
     __tablename__ = 'intento'
     fecha_hora = db.Column(db.DateTime, primary_key=True)
+    texto = db.Column(db.Text)
     bloque_id = db.Column(db.Integer, db.ForeignKey('bloque.id'))
+
+    def __repr__(self):
+        return '<Intento {}>'.format(self.texto)
 
 
