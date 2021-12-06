@@ -8,5 +8,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 EXPOSE 5000
-
-CMD [ "python", "./app.py", "--host=0.0.0.0"]
+ENTRYPOINT [ "python" ]
+CMD [ "./app.py", "--host=0.0.0.0"]

@@ -1,8 +1,12 @@
+import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import create_engine
 
 app = Flask(__name__)
-db = SQLAlchemy()
+app.debug = True
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
+db = SQLAlchemy(app)
 
 @app.route("/")
 def hello():
