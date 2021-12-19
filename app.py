@@ -1,6 +1,8 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask import request, jsonify
 from config import Config
+from datetime import datetime
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -21,7 +23,10 @@ class Bloque(db.Model):
 class Intento(db.Model):
 	"""Modelo para intento de lectura"""
 	__tablename__ = 'intento'
-	fecha_hora = db.Column(db.DateTime, primary_key=True)
+	fecha_hora = db.Column(db.DateTime, 
+						primary_key=True,
+						default=datetime.utcnow, 
+						onupdate=datetime.utcnow)
 	texto = db.Column(db.Text)
 	bloque_id = db.Column(db.Integer, db.ForeignKey('bloque.id'), nullable=False)
 
@@ -33,6 +38,13 @@ db.create_all()
 @app.route("/")
 def hello():
 	return "<h1 style='color:blue'>Hello There!</h1>"
+
+@app.route("/bloque", methods=['GET'])
+def get_bloques():
+	bloques = Bloque.query.order_by(Bloque.id).all()
+	for bloque in bloques:
+		print(f'{bloque.id} {bloque.path_imagen} {bloque.texto}')
+	return jsonify(bloques)
 
 @app.route("/captcha")
 def obtener_captcha():
