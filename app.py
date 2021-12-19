@@ -1,5 +1,4 @@
 from flask import Flask
-from Flask import request
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
 from captchaluisa.models import Bloque, Intento
