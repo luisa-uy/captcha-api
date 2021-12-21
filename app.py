@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from config import Config
 from datetime import datetime
-from flask_restful import Api, Resource
 import random
 
 app = Flask(__name__)
