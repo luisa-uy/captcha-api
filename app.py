@@ -91,17 +91,30 @@ def get_intentos():
 	return (jsonify(IntentoSchema(many=True).dump(all_intentos)), 200)
 
 
-@app.route("/api/captcha/")
+@app.route("/api/captcha/", methods = ['POST', 'GET'])
 def obtener_captcha():
-
-	captcha = Captcha()
-	size=db.session.query(Bloque).count()
-	for i in range(captcha_size):
+	if request.method == 'GET':
+		captcha = Captcha()
+		size=db.session.query(Bloque).count()
 		captcha.bloques.append(db.session.query(Bloque)[random.randrange(0, size)])
+		if captcha.bloques[0].texto is None:
+			subset = db.session.query(Bloque).filter(Bloque.texto.isnot(None))
+		else :
+			subset = db.session.query(Bloque).filter(Bloque.texto.is_(None))
+		
+		size = subset.count()
+		captcha.bloques.append(subset[random.randrange(0, size)])
 
-	db.session.add(captcha)
-	db.session.commit()
-	return  jsonify(captcha=CaptchaSchema().dump(captcha), status=200)
+		db.session.add(captcha)
+		db.session.commit()
+		return jsonify(captcha=CaptchaSchema().dump(captcha), status=200)
+
+	#TODO recibir el token y evaluar si los captchas son correctos
+	elif request.method == 'POST':
+		captcha = Captcha.query.filter_by(token=request.json['token']).first()
+		return jsonify(captcha=CaptchaSchema().dump(captcha), status=200)
+	else:
+		return jsonify(status=404)
 
 
 if __name__ == "__main__":
