@@ -112,7 +112,17 @@ def obtener_captcha():
 	#TODO recibir el token y evaluar si los captchas son correctos
 	elif request.method == 'POST':
 		captcha = Captcha.query.filter_by(token=request.json['token']).first()
-		return jsonify(captcha=CaptchaSchema().dump(captcha), status=200)
+		if captcha.bloques[0].texto is None:
+			vacio = 0
+			conocido = 1
+		else:
+			vacio = 1
+			conocido = 0
+		bloques = request.json['bloques']
+		if captcha.bloques[conocido].texto == request.json['bloques'][conocido]:
+			return jsonify(bloque=BloqueSchema().dump(captcha.bloques[conocido]), status=200)
+		else:
+			return jsonify(bloque=BloqueSchema().dump(captcha.bloques[conocido]), status=400)
 	else:
 		return jsonify(status=404)
 
