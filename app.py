@@ -5,6 +5,7 @@ from config import Config
 from datetime import datetime, date
 from sqlalchemy.dialects.postgresql import UUID
 from marshmallow_sqlalchemy.fields import Nested
+from flask_jsonpify import jsonpify
 import random
 import uuid
 
@@ -38,6 +39,7 @@ class Intento(db.Model):
 
 class Captcha(db.Model):
 	# Modelo para Captcha
+	# TODO: Guardar intentos
 	__tablename__ = 'captcha'
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 	fecha_hora = db.Column(db.DateTime, default=datetime.utcnow)
@@ -107,9 +109,8 @@ def obtener_captcha():
 
 		db.session.add(captcha)
 		db.session.commit()
-		return jsonify(captcha=CaptchaSchema().dump(captcha), status=200)
+		return jsonpify(captcha=CaptchaSchema().dump(captcha), status=200)
 
-	#TODO recibir el token y evaluar si los captchas son correctos
 	elif request.method == 'POST':
 		captcha = Captcha.query.filter_by(token=request.json['token']).first()
 		if captcha.bloques[0].texto is None:
