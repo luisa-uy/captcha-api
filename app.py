@@ -6,11 +6,14 @@ from datetime import datetime, date
 from sqlalchemy.dialects.postgresql import UUID
 from marshmallow_sqlalchemy.fields import Nested
 from flask_jsonpify import jsonpify
+from flask_cors import CORS, cross_origin
 import random
 import uuid
 
 app = Flask(__name__)
 app.config.from_object(Config)
+app.config['CORS_HEADERS'] = 'Content-Type'
+CORS(app)
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 captcha_size = 4 
@@ -20,7 +23,8 @@ class Bloque(db.Model):
 	# Modelo para bloques de texto
 	__tablename__ = 'bloque'
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-	# status = db.Column(db.Integer, default=0)
+	# status ­— 0: sin_conocer, 1: conocido, 2: inválido
+	status = db.Column(db.Integer, default=0)
 	path_imagen = db.Column(db.Text)
 	imagen = db.Column(db.Text)
 	texto = db.Column(db.Text)

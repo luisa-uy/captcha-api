@@ -18,5 +18,20 @@ class Config:
 	SQLALCHEMY_DATABASE_URI = environ.get("DATABASE_URI")
 	SQLALCHEMY_ECHO = False
 	SQLALCHEMY_TRACK_MODIFICATIONS = False
-	
+
+	CORS_ORIGIN_WHITELIST = [
+        'http://0.0.0.0:4100',
+        'http://localhost:4100',
+        'http://0.0.0.0:8000',
+        'http://localhost:8000',
+        'http://0.0.0.0:4200',
+        'http://localhost:4200',
+        'http://0.0.0.0:4000',
+        'http://localhost:4000',
+        'http://localhost:8080',
+        'http://0.0.0.0:8080',
+        'http://127.0.0.1:8080',
+        'http://192.168.100.6:8080',
+        'localhost:8080'
+    ]
 	
