@@ -22,8 +22,7 @@ class Bloque(db.Model):
 	# Modelo para bloques de texto
 	__tablename__ = 'bloque'
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-	# status ­— 0: sin_conocer, 1: conocido, 2: inválido
-	status = db.Column(db.Integer, default=0)
+	status = db.Column(db.Integer, default=0) # status ­— 0: sin_conocer, 1: conocido, 2: inválido
 	path_imagen = db.Column(db.Text)
 	imagen = db.Column(db.Text)
 	texto = db.Column(db.Text)
@@ -80,6 +79,7 @@ class CaptchaSchema(ma.SQLAlchemyAutoSchema):
 db.create_all()
 db.session.commit()
 
+# Constructor de un intento
 def post_intento(bloque_id, texto):
 	intento = Intento()
 	intento.bloque_id = bloque_id
@@ -106,24 +106,37 @@ def get_intentos():
 
 @app.route("/api/captcha/", methods = ['POST', 'GET'])
 def obtener_captcha():
+	
+	# Este método genera un Captcha con dos bloques y un token de sesión y lo retorna
 	if request.method == 'GET':
 		captcha = Captcha()
+		
+		# De los bloques existentes, se elige uno al azar.
 		size=db.session.query(Bloque).count()
 		captcha.bloques.append(db.session.query(Bloque)[random.randrange(0, size)])
+		
+		# Evalúa si el bloque está resuelto o no y consulta el subset de bloques contrario
 		if captcha.bloques[0].texto is None:
 			subset = db.session.query(Bloque).filter(Bloque.texto.isnot(None))
 		else :
 			subset = db.session.query(Bloque).filter(Bloque.texto.is_(None))
 		
+		# Extrae un bloque del subset al azar
 		size = subset.count()
 		captcha.bloques.append(subset[random.randrange(0, size)])
 
 		db.session.add(captcha)
 		db.session.commit()
+		
 		return jsonpify(captcha=CaptchaSchema().dump(captcha), status=200), 200
 
+	# Este método recibe el token de sesión y un array con las resoluciones de los bloques
 	elif request.method == 'POST':
+		
+		# Se obtiene a qué Captcha corresponde ese token
 		captcha = Captcha.query.filter_by(token=request.json['token']).first()
+		
+		# Reconoce cuál es el que conocemos la respuesta
 		if captcha.bloques[0].texto is None:
 			vacio = 0
 			conocido = 1
@@ -131,7 +144,7 @@ def obtener_captcha():
 			vacio = 1
 			conocido = 0
 
-		# Se ingresan los intentos
+		# Se ingresan los intentos en base
 		bloques = request.json['bloques']
 		intento_0 = post_intento(captcha.bloques[0].id, bloques[0])
 		intento_1 = post_intento(captcha.bloques[1].id, bloques[1])
@@ -148,6 +161,7 @@ def obtener_captcha():
 				intento_1=IntentoSchema().dump(intento_1), 
 				status=200), 200
 		else:
+			# Devuelve 401 — Unauthorized si no se resuelve el bloque conocido
 			return jsonify(bloque=BloqueSchema().dump(captcha.bloques[conocido]), status=401), 401
 	else:
 		return jsonify(status=404)
