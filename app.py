@@ -15,8 +15,8 @@ app = Flask(__name__)
 app.config.from_object(Config)
 app.config['CORS_HEADERS'] = 'Content-Type'
 CORS(app)
-metadata = MetaData(schema="captcha", metadata=metadata)
-db = SQLAlchemy(app)
+metadata = MetaData(schema="captcha")
+db = SQLAlchemy(app, metadata=metadata)
 ma = Marshmallow(app)
 captcha_size = 4 
 
