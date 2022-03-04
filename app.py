@@ -14,6 +14,7 @@ app = Flask(__name__)
 app.config.from_object(Config)
 app.config['CORS_HEADERS'] = 'Content-Type'
 CORS(app)
+metadata = MetaData(schema="captcha", metadata=metadata)
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 captcha_size = 4 
@@ -27,7 +28,7 @@ class Bloque(db.Model):
 	imagen = db.Column(db.Text)
 	texto = db.Column(db.Text)
 	intentos = db.relationship('Intento')
-	captchas = db.relationship("Captcha", secondary='bloque_captcha', back_populates='bloques')
+	captchas = db.relationship("Captcha", secondary='captcha.bloque_captcha', back_populates='bloques')
 
 # TODO: Guardar el estado del Intento para saber si es fallido (cuando se conoce el valor)
 class Intento(db.Model):
@@ -47,7 +48,7 @@ class Captcha(db.Model):
 	fecha_hora = db.Column(db.DateTime, default=datetime.utcnow)
 	status = db.Column(db.Integer, default=0)
 	token = db.Column(UUID(as_uuid=True), default=uuid.uuid4)
-	bloques = db.relationship("Bloque", secondary="bloque_captcha", back_populates='captchas')
+	bloques = db.relationship("Bloque", secondary="captcha.bloque_captcha", back_populates='captchas')
 
 class BloqueCaptcha(db.Model):
 	# ManyToMany entre Bloque y Captcha
