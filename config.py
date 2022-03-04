@@ -10,6 +10,7 @@ class Config:
 	"""Set Flask configuration from .env file."""
 
 	# General Config
+	HOST_IP = environ.get('HOST_IP')
 	FLASK_APP = environ.get('FLASK_APP')
 	FLASK_ENV = environ.get('FLASK_ENV')
 	DEBUG = True
