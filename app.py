@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from config import Config
 from datetime import datetime, date
+from sqlalchemy import MetaData
 from sqlalchemy.dialects.postgresql import UUID
 from marshmallow_sqlalchemy.fields import Nested
 from flask_jsonpify import jsonpify
